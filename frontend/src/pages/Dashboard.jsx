@@ -5,10 +5,11 @@ import { fetchChatHistory, fetchChatById } from "../utils/api";
 
 const Dashboard = () => {
 
-const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user") || "{}")
   );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [chats, setChats] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -16,31 +17,31 @@ const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(true);
 
-  
+
   useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const tokenFromGoogle = params.get("token");
-  const userFromGoogle = params.get("user");
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromGoogle = params.get("token");
+    const userFromGoogle = params.get("user");
 
-  if (tokenFromGoogle) {
-    localStorage.setItem("token", tokenFromGoogle);
-    if (userFromGoogle) {
-      localStorage.setItem(
-  "user",
-  JSON.stringify(
-    JSON.parse(
-      decodeURIComponent(userFromGoogle)
-    )
-  )
-);
+    if (tokenFromGoogle) {
+      localStorage.setItem("token", tokenFromGoogle);
+      if (userFromGoogle) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify(
+            JSON.parse(
+              decodeURIComponent(userFromGoogle)
+            )
+          )
+        );
+      }
+      window.history.replaceState({}, "", "/dashboard");
+
+      setUser(JSON.parse(decodeURIComponent(userFromGoogle)));
     }
-    window.history.replaceState({}, "", "/dashboard");
+  }, []);
 
-    setUser(JSON.parse(decodeURIComponent(userFromGoogle)));
-  }
-}, []);
 
-  
   useEffect(() => {
     const loadHistory = async () => {
       try {
@@ -68,7 +69,7 @@ const [search, setSearch] = useState("");
     setMessages([]);
   };
 
-  
+
   const handleSelectChat = async (id) => {
     try {
       const data = await fetchChatById(id);
@@ -123,7 +124,7 @@ const [search, setSearch] = useState("");
           ...prev,
         ]);
       } else {
-        
+
         setChats((prev) =>
           prev.map((c) =>
             c.id === activeId
@@ -143,14 +144,39 @@ const [search, setSearch] = useState("");
   };
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
-      <Sidebar
-        chats={chats}
-        setChats={setChats}      
-        activeId={activeId}
-        onSelect={handleSelectChat}
-        onNewChat={handleNewChat}
-      />
+    <div className="h-screen flex overflow-hidden relative bg-[#F8FAFC]">
+
+
+      <>
+        <div
+          className={`fixed lg:relative z-50 h-full transition-transform duration-300
+    ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+    lg:translate-x-0`}
+        >
+          <Sidebar
+            chats={chats}
+            setChats={setChats}
+            activeId={activeId}
+            onSelect={(id) => {
+              handleSelectChat(id);
+              setSidebarOpen(false);
+            }}
+            onNewChat={() => {
+              handleNewChat();
+              setSidebarOpen(false);
+            }}
+          />
+        </div>
+
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+      </>
+
+
       <div className="flex-1 overflow-hidden">
         {historyLoading ? (
           <div className="flex items-center justify-center h-full text-gray-400">
@@ -163,6 +189,7 @@ const [search, setSearch] = useState("");
             input={input}
             setInput={setInput}
             onSend={handleSend}
+            setSidebarOpen={setSidebarOpen}
           />
         )}
       </div>

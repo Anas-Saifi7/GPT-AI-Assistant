@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-const ChatWindow = ({ messages, loading, input, setInput, onSend }) => {
+const ChatWindow = ({
+  messages,
+  loading,
+  input,
+  setInput,
+  onSend,
+  setSidebarOpen,
+}) => {
   const bottomRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -14,6 +21,19 @@ const username = user.username;
 
   return (
     <div className="flex flex-col flex-1 h-screen">
+
+      <div className="lg:hidden bg-white border-b px-4 py-3 flex items-center gap-3">
+  <button
+    onClick={() => setSidebarOpen(true)}
+    className="text-2xl"
+  >
+    ☰
+  </button>
+
+  <h1 className="font-semibold">
+    AI Assistant
+  </h1>
+</div>
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 bg-[#f8fafc]">

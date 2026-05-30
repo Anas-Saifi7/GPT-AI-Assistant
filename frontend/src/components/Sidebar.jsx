@@ -13,7 +13,7 @@ const Sidebar = ({ chats, setChats, activeId, onSelect, onNewChat }) => {
   };
 
   const handleDelete = async (e, chatId) => {
-    e.stopPropagation(); // chat select na ho
+    e.stopPropagation();
     try {
       await deleteChatAPI(chatId);
       setChats((prev) => prev.filter((c) => c.id !== chatId));
