@@ -32,6 +32,8 @@ export const loginUser = async (data) => {
 
   const result = await res.json();
 
+  console.log("LOGIN RESPONSE =>", result);
+
   if (!res.ok) {
     throw new Error(result.message || "Login failed");
   }
