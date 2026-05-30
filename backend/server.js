@@ -12,6 +12,8 @@ require("./config/passport");
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 ConnectDB();
 
 //  Correct middleware order
